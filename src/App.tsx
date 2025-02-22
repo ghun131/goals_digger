@@ -71,7 +71,7 @@ function AppContent() {
     fetchGoals();
   }, [currentUser]);
 
-  if (loading || goals.length === 0) {
+  if (loading) {
     return (
       <div className="h-full flex items-center justify-center bg-black">
         <div className="text-white">Loading...</div>

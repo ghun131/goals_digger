@@ -64,7 +64,6 @@ export default function GoalSuccess() {
           };
 
           setGoalData(currGoalData);
-          console.log("goalData", goalData);
           setLoading(false);
         } catch (error) {
           console.error("Error fetching goals:", error);
@@ -93,6 +92,7 @@ export default function GoalSuccess() {
 
       // Get latest goal data to verify amount
       const goalDoc = await getDoc(doc(db, "goals", goalData.goalId));
+      console.log("goalDoc:", goalDoc);
       if (!goalDoc.exists()) {
         setError("Goal not found");
         return;

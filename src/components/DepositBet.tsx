@@ -1,7 +1,8 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, query, collection, where, getDocs } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { useAuth } from "../contexts/AuthContext";
 import bankQR from "../assets/host_bank_qr.jpeg";
 
 interface LocationState {
@@ -15,15 +16,62 @@ interface LocationState {
 export default function DepositBet() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser } = useAuth();
   const goalData = location.state as LocationState;
   const [isExpanded, setIsExpanded] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     amount: "",
     transactionId: "",
   });
+
+  useEffect(() => {
+    const checkExistingGoal = async () => {
+      try {
+        if (!currentUser?.uid) return;
+
+        // Query goals collection for in_progress goals
+        const goalsRef = collection(db, "goals");
+        const q = query(
+          goalsRef,
+          where("userId", "==", currentUser.uid),
+          where("status", "==", "in_progress")
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        // If user has an in_progress goal, redirect to timer
+        if (!querySnapshot.empty) {
+          const goalDoc = querySnapshot.docs[0];
+          const goalData = goalDoc.data();
+
+          navigate("/timer", {
+            state: {
+              goal: goalData.goal,
+              deadline: goalData.deadline,
+              time: goalData.time,
+              epochTimestamp: goalData.epochTimestamp,
+              goalId: goalDoc.id,
+              amount: goalData.amount,
+              transactionId: goalData.transactionId,
+            },
+            replace: true,
+          });
+          return;
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to check existing goals");
+        setLoading(false);
+      }
+    };
+
+    checkExistingGoal();
+  }, [currentUser, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,6 +111,14 @@ export default function DepositBet() {
   };
 
   const deadlineDate = new Date(goalData?.epochTimestamp).toLocaleString();
+
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center bg-black">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black py-8 px-4">

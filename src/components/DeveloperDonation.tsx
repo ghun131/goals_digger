@@ -8,7 +8,7 @@ interface LocationState {
 
 export default function DeveloperDonation() {
   const location = useLocation();
-  const { goal, amount } = location.state as LocationState;
+  const { goal } = location.state as LocationState;
 
   return (
     <div className="min-h-screen bg-black py-8 px-4">

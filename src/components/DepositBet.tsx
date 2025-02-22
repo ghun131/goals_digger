@@ -1,6 +1,6 @@
-import { useState, FormEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import bankQR from '../assets/host_bank_qr.jpeg';
+import { FormEvent, useState } from "react";
+import { useLocation } from "react-router-dom";
+import bankQR from "../assets/host_bank_qr.jpeg";
 
 interface LocationState {
   goal: string;
@@ -11,26 +11,20 @@ interface LocationState {
 
 export default function DepositBet() {
   const location = useLocation();
-  const navigate = useNavigate();
   const goalData = location.state as LocationState;
   const [isExpanded, setIsExpanded] = useState(false);
 
   const [formData, setFormData] = useState({
-    amount: '',
-    transactionId: ''
+    amount: "",
+    transactionId: "",
   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Bet submitted:', {
+    console.log("Bet submitted:", {
       ...formData,
-      goalData
+      goalData,
     });
-  };
-
-  const truncateText = (text: string, maxLength: number) => {
-    if (!text || text.length <= maxLength) return text;
-    return text.substr(0, maxLength) + '...';
   };
 
   const deadlineDate = new Date(goalData?.epochTimestamp).toLocaleString();
@@ -48,12 +42,14 @@ export default function DepositBet() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-white mb-2">Your Goal</h2>
           <div className="relative">
-            <p 
-              onClick={() => goalData?.goal?.length > 50 && setIsExpanded(!isExpanded)}
-              className={`text-gray-400 ${
-                !isExpanded && 'line-clamp-1'
-              } ${
-                goalData?.goal?.length > 50 ? 'cursor-pointer hover:text-gray-300' : ''
+            <p
+              onClick={() =>
+                goalData?.goal?.length > 50 && setIsExpanded(!isExpanded)
+              }
+              className={`text-gray-400 ${!isExpanded && "line-clamp-1"} ${
+                goalData?.goal?.length > 50
+                  ? "cursor-pointer hover:text-gray-300"
+                  : ""
               }`}
             >
               {goalData?.goal}
@@ -63,11 +59,13 @@ export default function DepositBet() {
         </div>
 
         <div className="mb-8">
-          <h3 className="text-lg font-medium text-white mb-4">Make a transfer to:</h3>
+          <h3 className="text-lg font-medium text-white mb-4">
+            Make a transfer to:
+          </h3>
           <div className="bg-white p-4 rounded-lg flex justify-center">
-            <img 
-              src={bankQR} 
-              alt="Bank QR Code" 
+            <img
+              src={bankQR}
+              alt="Bank QR Code"
               className="w-full max-w-[280px] h-auto rounded"
             />
           </div>
@@ -78,7 +76,10 @@ export default function DepositBet() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="text-left">
-            <label htmlFor="amount" className="block text-sm font-medium text-white mb-2">
+            <label
+              htmlFor="amount"
+              className="block text-sm font-medium text-white mb-2"
+            >
               Deposit Amount (VND)
             </label>
             <input
@@ -90,12 +91,17 @@ export default function DepositBet() {
               className="w-full px-4 py-3 bg-black rounded-lg border border-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="100,000"
               value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, amount: e.target.value })
+              }
             />
           </div>
 
           <div className="text-left">
-            <label htmlFor="transactionId" className="block text-sm font-medium text-white mb-2">
+            <label
+              htmlFor="transactionId"
+              className="block text-sm font-medium text-white mb-2"
+            >
               Transaction Reference (Optional)
             </label>
             <input
@@ -104,7 +110,9 @@ export default function DepositBet() {
               className="w-full px-4 py-3 bg-black rounded-lg border border-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter transaction reference"
               value={formData.transactionId}
-              onChange={(e) => setFormData({ ...formData, transactionId: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, transactionId: e.target.value })
+              }
             />
           </div>
 
@@ -118,4 +126,4 @@ export default function DepositBet() {
       </div>
     </div>
   );
-} 
+}

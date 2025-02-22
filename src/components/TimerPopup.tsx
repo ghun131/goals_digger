@@ -1,8 +1,17 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import RefreshIcon from "../assets/icons/RefreshIcon";
+import { useAuth } from "../contexts/AuthContext";
 
 interface LocationState {
   goal: string;
@@ -22,8 +31,7 @@ interface TimeLeft {
 
 export default function TimerPopup() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const goalData = location.state as LocationState;
+  const { currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [goalDetails, setGoalDetails] = useState<LocationState | null>(null);
@@ -36,31 +44,46 @@ export default function TimerPopup() {
   const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
-    const fetchGoalDetails = async () => {
+    const fetchInProgressGoal = async () => {
+      if (!currentUser) return;
+
       try {
-        const goalDoc = await getDoc(doc(db, "goals", goalData.goalId));
-        if (goalDoc.exists()) {
-          const data = goalDoc.data();
-          setGoalDetails({
-            goal: data.goal,
-            deadline: data.deadline,
-            time: data.time,
-            epochTimestamp: data.epochTimestamp,
-            goalId: goalData.goalId,
-            amount: data.amount,
-            transactionId: data.transactionId,
-          });
+        setLoading(true);
+        const goalsRef = collection(db, "goals");
+        const goalsQuery = query(
+          goalsRef,
+          where("userId", "==", currentUser.uid),
+          where("status", "==", "in_progress")
+        );
+
+        const querySnapshot = await getDocs(goalsQuery);
+        if (querySnapshot.empty) {
+          navigate("/goals");
+          return;
         }
+
+        const goalDoc = querySnapshot.docs[0];
+        const goalData = goalDoc.data();
+
+        setGoalDetails({
+          goal: goalData.goal,
+          deadline: goalData.deadline,
+          time: goalData.time,
+          epochTimestamp: goalData.epochTimestamp,
+          goalId: goalDoc.id,
+          amount: goalData.amount,
+          transactionId: goalData.transactionId,
+        });
       } catch (err) {
         console.error("Error fetching goal:", err);
-        setError("Failed to load goal details");
+        setError("Failed to fetch goal details");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGoalDetails();
-  }, [goalData.goalId]);
+    fetchInProgressGoal();
+  }, [currentUser, navigate]);
 
   const calculateTimeLeft = () => {
     if (!goalDetails) return;
@@ -80,7 +103,8 @@ export default function TimerPopup() {
   };
 
   useEffect(() => {
-    if (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0) {
+    const currentTime = new Date().getTime();
+    if (goalDetails && currentTime >= goalDetails?.epochTimestamp) {
       handleGiveUp();
     }
 
@@ -114,13 +138,8 @@ export default function TimerPopup() {
       });
 
       // Navigate to success page
-      navigate("/goal-success", {
-        state: {
-          goal: goalDetails?.goal,
-          amount: goalDetails?.amount,
-          goalId: goalDetails?.goalId,
-        },
-      });
+      navigate("/goal-success");
+      setIsConfirming(false);
     } catch (err) {
       console.error("Error updating goal status:", err);
       setError("Failed to update goal status");

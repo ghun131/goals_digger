@@ -24,12 +24,7 @@ export default function WaitingConfirmation() {
     const unsubscribe = onSnapshot(doc(db, "goals", goalData.goalId), (doc) => {
       const data = doc.data();
       if (data?.status === "in_progress") {
-        navigate("/timer", {
-          state: {
-            ...goalData,
-          },
-          replace: true,
-        });
+        navigate("/timer");
       }
     });
 

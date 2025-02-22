@@ -21,11 +21,12 @@ import WaitingConfirmation from "./components/WaitingConfirmation";
 import { db } from "./config/firebase";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
-interface Goal {
+export interface Goal {
   id: string;
   goal: string;
   status: string;
   userId: string;
+  amount: number;
   // ... other goal properties
 }
 
@@ -57,7 +58,6 @@ function AppContent() {
           id: doc.id,
           ...doc.data(),
         })) as Goal[];
-        console.log("fetchedGoals:", fetchedGoals);
 
         setGoals(fetchedGoals);
         console.log("Fetched goals:", fetchedGoals); // For debugging

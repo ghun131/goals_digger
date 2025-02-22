@@ -26,6 +26,7 @@ interface Donation {
   org_id: string;
   org_name: string;
   org_description: string;
+  org_link: string;
   message: string;
   userRef: DocumentReference;
   goalRef: DocumentReference;
@@ -37,17 +38,38 @@ const CHARITIES = [
   {
     id: "qtnvc",
     name: "Quỹ trò nghèo vùng cao",
-    description: "Supporting education for children in highland areas",
+    description:
+      "The Trò Nghèo Vùng Cao Fund (formerly the Cơm Có Thịt Program) is a non-profit charity supporting underprivileged students in Vietnam’s highland areas. The fund provides nutritious meals, warm clothing, school supplies, dormitories, and other essential assistance to improve their learning and living conditions.",
+    link: "https://tnvc.vn/",
   },
   {
-    id: "nhandao",
-    name: "Cổng nhân đạo quốc gia 1400",
-    description: "National humanitarian gateway for various causes",
+    // id should be short in lowercase
+    id: "ccumctekt",
+    name: "Chắp cánh ước mơ cho trẻ em khuyết tật",
+    description:
+      'The "Chắp cánh ước mơ cho trẻ em khuyết tật" program calls for collective support to provide scholarships, rehabilitation assistance, medical care, and opportunities for disabled children to pursue their dreams and build a brighter future.',
+    link: "https://1400.vn/chuong-trinh/trien-khai-chuong-trinh--chap-canh-uoc-mo-cho-tre-em-khuyet-tat-pass1255",
   },
   {
-    id: "langtresos",
-    name: "Làng trẻ SOS",
-    description: "Providing homes and care for orphaned children",
+    id: "qbttevn",
+    name: "Quỹ bảo trợ trẻ em Việt Nam",
+    description:
+      'The "Quỹ bảo trợ trẻ em Việt Nam" was established to mobilize voluntary contributions from organizations and individuals domestically and internationally, as well as international aid and state budget support when necessary, to achieve government-prioritized goals for child welfare.',
+    link: "https://nfvc.molisa.gov.vn/contact",
+  },
+  {
+    id: "vteemkttvn",
+    name: "Vì trẻ em khuyết tật Việt Nam",
+    description:
+      'The "Vì trẻ em khuyết tật Việt Nam" serves as a bridge to coordinate support activities, seeking contributions and collaboration from organizations and individuals both domestically and internationally. The fund aims to improve the physical and mental well-being of disabled children, ensure their rights, and inspire hope for a brighter future.',
+    link: "https://vitreemkhuyettat.org/dong-hanh.html",
+  },
+  {
+    id: "qttcd",
+    name: "Quỹ từ thiện vì Cộng Đồng",
+    description:
+      'The "Quỹ từ thiện vì Cộng Đồng" is a non-profit organization that mobilizes resources to support charitable programs, assist disadvantaged Vietnamese citizens, promote public health, and aid in disaster recovery, contributing to a sustainable future.',
+    link: "https://comfunds.vn/",
   },
 ];
 
@@ -56,7 +78,7 @@ export default function CharitySelection() {
   const location = useLocation();
   const { currentUser } = useAuth();
   const goalData = location.state as GoalLocationState;
-  console.log("goalData:", goalData)
+  console.log("goalData:", goalData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [existingDonation, setExistingDonation] = useState<Donation | null>(
@@ -96,6 +118,8 @@ export default function CharitySelection() {
     };
 
     checkExistingDonation();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSelect = async (charityId: string) => {
@@ -118,11 +142,11 @@ export default function CharitySelection() {
 
       // Create donation record
       const donationData = {
-        amount: goalData.amount,
         status: "pending", // pending, completed
         org_id: selectedCharity.id,
         org_name: selectedCharity.name,
         org_description: selectedCharity.description,
+        org_link: selectedCharity.link,
         message: `${currentUser?.email} supports ${selectedCharity.name}`,
         userRef: doc(db, "users", currentUser?.uid || ""),
         goalRef: doc(db, "goals", goalData.goalId),
@@ -229,6 +253,18 @@ export default function CharitySelection() {
                 <span className="text-white">{existingDonation.org_name}</span>
               </p>
               <p className="text-gray-400">
+                Organization Link:{" "}
+                <span className="text-white">
+                  <a
+                    href={existingDonation.org_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {existingDonation.org_link}
+                  </a>
+                </span>
+              </p>
+              <p className="text-gray-400">
                 Message:{" "}
                 <span className="text-white">{existingDonation.message}</span>
               </p>
@@ -295,7 +331,9 @@ export default function CharitySelection() {
               <h3 className="text-lg font-semibold text-white mb-1">
                 {charity.name}
               </h3>
-              <p className="text-sm text-gray-400">{charity.description}</p>
+              <p className="text-sm text-gray-400 text-justify">
+                {charity.description}
+              </p>
             </div>
           ))}
         </div>

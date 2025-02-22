@@ -54,7 +54,7 @@ export default function SignIn() {
         </p>
 
         {error && (
-          <div className="bg-red-500 bg-opacity-10 text-red-500 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-500 bg-opacity-10 text-black px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}

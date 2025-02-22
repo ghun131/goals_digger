@@ -128,7 +128,7 @@ export default function GoalSuccess() {
                 onChange={(e) => setAmount(e.target.value)}
               />
             </div>
-            {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+            {error && <p className="mt-2 text-sm text-black">{error}</p>}
           </div>
 
           <button

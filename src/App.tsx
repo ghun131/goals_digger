@@ -15,7 +15,10 @@ import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import TimerPopup from "./components/TimerPopup";
 import WaitingConfirmation from "./components/WaitingConfirmation";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
+
+// Add PrivateRoute component
 
 function App() {
   return (
@@ -25,18 +28,48 @@ function App() {
           <Routes>
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/goals" element={<GoalSetting />} />
-            <Route path="/deposit" element={<DepositBet />} />
-            <Route
-              path="/waiting-confirmation"
-              element={<WaitingConfirmation />}
-            />
-
-            <Route path="/timer" element={<TimerPopup />} />
-            <Route path="/lose-options" element={<LoseOptions />} />
-            <Route path="/charity-selection" element={<CharitySelection />} />
-            <Route path="/developer-donation" element={<DeveloperDonation />} />
-            <Route path="/goal-success" element={<GoalSuccess />} />
+            
+            {/* Protected Routes */}
+            <Route path="/goals" element={
+              <PrivateRoute>
+                <GoalSetting />
+              </PrivateRoute>
+            } />
+            <Route path="/deposit" element={
+              <PrivateRoute>
+                <DepositBet />
+              </PrivateRoute>
+            } />
+            <Route path="/waiting-confirmation" element={
+              <PrivateRoute>
+                <WaitingConfirmation />
+              </PrivateRoute>
+            } />
+            <Route path="/timer" element={
+              <PrivateRoute>
+                <TimerPopup />
+              </PrivateRoute>
+            } />
+            <Route path="/lose-options" element={
+              <PrivateRoute>
+                <LoseOptions />
+              </PrivateRoute>
+            } />
+            <Route path="/charity-selection" element={
+              <PrivateRoute>
+                <CharitySelection />
+              </PrivateRoute>
+            } />
+            <Route path="/developer-donation" element={
+              <PrivateRoute>
+                <DeveloperDonation />
+              </PrivateRoute>
+            } />
+            <Route path="/goal-success" element={
+              <PrivateRoute>
+                <GoalSuccess />
+              </PrivateRoute>
+            } />
 
             <Route path="/" element={<Navigate to="/sign-in" replace />} />
           </Routes>

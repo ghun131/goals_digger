@@ -21,101 +21,13 @@ interface Goal {
 export default function GoalSetting() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     goal: "",
     deadline: "",
     time: "18:00", // Default time
   });
-
-  useEffect(() => {
-    const checkExistingGoals = async () => {
-      try {
-        if (!currentUser?.uid) return;
-
-        // Query goals collection for active goals
-        const goalsRef = collection(db, "goals");
-        const q = query(
-          goalsRef,
-          where("userId", "==", currentUser.uid),
-          where("status", "in", ["pending", "in_progress", "success", "donating"])
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const goals = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as Goal[];
-          console.log("goals:", goals)
-
-          for (const goal of goals) {
-            switch (goal.status) {
-              case "pending":
-                navigate("/waiting-confirmation", {
-                  state: {
-                    goal: goal.goal,
-                    deadline: goal.deadline,
-                    time: goal.time,
-                    epochTimestamp: goal.epochTimestamp,
-                    goalId: goal.id,
-                    amount: goal.amount,
-                    transactionId: goal.transactionId,
-                  },
-                  replace: true,
-                });
-                break;
-
-              case "in_progress":
-                navigate("/timer", {
-                  state: {
-                    goal: goal.goal,
-                    deadline: goal.deadline,
-                    time: goal.time,
-                    epochTimestamp: goal.epochTimestamp,
-                    goalId: goal.id,
-                    amount: goal.amount,
-                    transactionId: goal.transactionId,
-                  },
-                  replace: true,
-                });
-                break;
-
-              case "success":
-                navigate("/goal-success", {
-                  state: {
-                    goal: goal.goal,
-                    amount: goal.amount,
-                    goalId: goal.id,
-                  },
-                  replace: true,
-                });
-                break;
-
-              case "donating":
-                navigate("/charity-selection", {
-                  state: {
-                    goal: goal.goal,
-                    amount: goal.amount,
-                    goalId: goal.id,
-                  },
-                });
-            }
-          }
-        }
-
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to check existing goals");
-        setLoading(false);
-      }
-    };
-
-    checkExistingGoals();
-  }, [currentUser, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

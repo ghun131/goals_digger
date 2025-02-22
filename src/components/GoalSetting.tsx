@@ -1,22 +1,8 @@
-import { FormEvent, useState, useEffect } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../config/firebase";
-
-interface Goal {
-  id: string;
-  goal: string;
-  deadline: string;
-  time: string;
-  epochTimestamp: number;
-  userId: string;
-  amount: number;
-  transactionId: string;
-  updatedAt: number;
-  status: string;
-  createdAt: number;
-}
+import { useAuth } from "../contexts/AuthContext"
 
 export default function GoalSetting() {
   const navigate = useNavigate();

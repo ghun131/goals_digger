@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
-  doc,
-  getDoc,
-  updateDoc,
   collection,
-  query,
-  where,
+  doc,
   getDocs,
+  query,
+  updateDoc,
+  where
 } from "firebase/firestore";
-import { db } from "../config/firebase";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import RefreshIcon from "../assets/icons/RefreshIcon";
+import { db } from "../config/firebase";
 import { useAuth } from "../contexts/AuthContext";
 
 interface LocationState {

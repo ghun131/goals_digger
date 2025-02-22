@@ -79,7 +79,7 @@ function AppContent() {
     );
   }
 
-  const currentGoal = goals.find((goal) => goal.status === "in_progress");
+  const currentGoal = goals?.[0];
 
   return (
     <div className="h-screen w-screen bg-black">
@@ -166,7 +166,7 @@ function AppContent() {
             currentGoal?.status === "in_progress" ? (
               <Navigate to="/timer" replace />
             ) : (
-              <Navigate to="/sign-in" replace />
+              <Navigate to="/goals" replace />
             )
           }
         />

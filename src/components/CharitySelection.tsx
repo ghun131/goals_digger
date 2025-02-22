@@ -78,7 +78,6 @@ export default function CharitySelection() {
   const location = useLocation();
   const { currentUser } = useAuth();
   const goalData = location.state as GoalLocationState;
-  console.log("goalData:", goalData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [existingDonation, setExistingDonation] = useState<Donation | null>(
@@ -101,13 +100,15 @@ export default function CharitySelection() {
 
         if (!querySnapshot.empty) {
           const donationData = querySnapshot.docs[0].data() as Donation;
-
           if (donationData.status === "completed") {
             navigate("/goals", { replace: true });
             return;
           }
 
-          setExistingDonation(donationData);
+          setExistingDonation({
+            ...donationData,
+            amount: goalData.amount,
+          } as Donation);
         }
       } catch (err) {
         console.error("Error checking donations:", err);
@@ -155,7 +156,10 @@ export default function CharitySelection() {
       };
 
       await addDoc(collection(db, "donations"), donationData);
-      setExistingDonation(donationData as Donation);
+      setExistingDonation({
+        ...donationData,
+        amount: goalData.amount,
+      } as Donation);
     } catch (err) {
       console.error("Error processing donation:", err);
       setError("Failed to process donation. Please try again.");

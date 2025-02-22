@@ -1,6 +1,13 @@
 import { FormEvent, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { doc, updateDoc, query, collection, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  query,
+  collection,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import bankQR from "../assets/host_bank_qr.jpeg";
@@ -9,8 +16,7 @@ interface LocationState {
   goal: string;
   deadline: string;
   time: string;
-  epochTimestamp: number
-              ;
+  epochTimestamp: number;
   goalId: string;
 }
 
@@ -99,9 +105,9 @@ export default function DepositBet() {
         state: {
           ...goalData,
           amount: Number(formData.amount),
-          transactionId: formData.transactionId
+          transactionId: formData.transactionId,
         },
-        replace: true
+        replace: true,
       });
     } catch (err) {
       console.error(err);

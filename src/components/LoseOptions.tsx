@@ -1,22 +1,22 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-// Mock goal data (simulating data from GoalSetting)
-const mockGoal = {
-  goal: "Learn to play guitar in 3 months",
-  deadline: "2024-06-15",
-  time: "18:00",
-  epochTimestamp: 1718467200000,
-  amount: "500000"
-};
+interface GoalLocationState {
+  goal: string;
+  amount: number;
+  goalId: string;
+  epochTimestamp: number;
+}
 
 export default function LoseOptions() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const goalData = location.state as GoalLocationState;
 
   const handleOptionSelect = (option: 'developers' | 'charity') => {
     if (option === 'charity') {
-      navigate('/charity-selection', { state: mockGoal });
+      navigate('/charity-selection', { state: goalData });
     } else {
-      navigate('/developer-donation', { state: mockGoal });
+      navigate('/developer-donation', { state: goalData });
     }
   };
 
@@ -32,9 +32,9 @@ export default function LoseOptions() {
 
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-white mb-2">Your Goal</h2>
-          <p className="text-gray-400">{mockGoal.goal}</p>
+          <p className="text-gray-400">{goalData.goal}</p>
           <p className="text-sm text-gray-500 mt-1">
-            Due by: {new Date(mockGoal.epochTimestamp).toLocaleString()}
+            Due by: {new Date(goalData.epochTimestamp).toLocaleString()}
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function LoseOptions() {
         </div>
 
         <p className="text-sm text-gray-500 mt-6 text-center">
-          Select an option to proceed with your donation of {mockGoal.amount} VND
+          Select an option to proceed with your donation of {goalData.amount} VND
         </p>
       </div>
     </div>

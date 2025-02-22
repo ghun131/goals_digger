@@ -1,0 +1,77 @@
+[
+    {
+        "bank_name": "Tien Phong Bank (TPBank)",
+        "internet_banking": true,
+        "website": "https://tpb.vn"
+    },
+    {
+        "bank_name": "Vietnam Prosperity Joint Stock Commercial Bank (VPBank)",
+        "internet_banking": true,
+        "website": "https://www.vpbank.com.vn"
+    },
+    {
+        "bank_name": "Vietnam Technological and Commercial Joint Stock Bank (Techcombank)",
+        "internet_banking": true,
+        "website": "https://www.techcombank.com.vn"
+    },
+    {
+        "bank_name": "Woori Bank Vietnam",
+        "internet_banking": true,
+        "website": "https://woori.com.vn/en/internet-mobile-banking/"
+    },
+    {
+        "bank_name": "Sacombank",
+        "internet_banking": true,
+        "website": "https://www.sacombank.com.vn/en/personal/digital-banking/internet-banking.html"
+    },
+    {
+        "bank_name": "Citibank Vietnam",
+        "internet_banking": true,
+        "website": "https://www.citibank.com.vn/en/personal-banking/internet-banking-services/"
+    },
+    {
+        "bank_name": "National Citizen Bank (NCB)",
+        "internet_banking": true,
+        "website": "https://www.ncb-bank.vn/en/personal/internet-banking-p36"
+    },
+    {
+        "bank_name": "United Overseas Bank (UOB) Vietnam",
+        "internet_banking": true,
+        "website": "https://www.uob.com.vn/personal-en/digital-banking/personal-internet-banking.page"
+    },
+    {
+        "bank_name": "Timo Digital Bank",
+        "internet_banking": true,
+        "website": "https://timo.vn/en/blogs-en/community-blog/timo-first-digital-bank-vietnam/"
+    },
+    {
+        "bank_name": "HSBC Vietnam",
+        "internet_banking": true,
+        "website": "https://www.hsbc.com.vn/en-vn/"
+    },
+    {
+        "bank_name": "Shinhan Bank Vietnam",
+        "internet_banking": true,
+        "website": "https://shinhan.com.vn/en/corporate/internet-banking.html"
+    },
+    {
+        "bank_name": "KBank Vietnam",
+        "internet_banking": true,
+        "website": "https://www.kasikornbank.com.vn/EN/corporate/internet-banking/Pages/internet-banking.aspx"
+    },
+    {
+        "bank_name": "CIMB Bank Vietnam",
+        "internet_banking": true,
+        "website": "https://en.wikipedia.org/wiki/CIMB"
+    },
+    {
+        "bank_name": "Vietcombank",
+        "internet_banking": true,
+        "website": "https://ru.wikipedia.org/wiki/Vietcombank"
+    },
+    {
+        "bank_name": "Orient Commercial Joint Stock Bank (OCB)",
+        "internet_banking": true,
+        "website": "https://en.wikipedia.org/wiki/Orient_Commercial_Joint_Stock_Bank"
+    }
+]

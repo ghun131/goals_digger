@@ -137,9 +137,16 @@ export default function TimerPopup() {
         updatedAt: new Date().getTime(),
       });
 
-      // Navigate to success page
-      navigate("/goal-success");
-      setIsConfirming(false);
+
+      console.log('navigate to goal-success')
+
+     navigate("/goal-success", {
+        state: {
+          goal: goalDetails?.goal,
+          amount: goalDetails?.amount,
+          goalId: goalDetails?.goalId,
+        },
+      });
     } catch (err) {
       console.error("Error updating goal status:", err);
       setError("Failed to update goal status");

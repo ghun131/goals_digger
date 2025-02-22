@@ -84,16 +84,6 @@ function AppContent() {
   return (
     <div className="h-screen w-screen bg-black">
       <Routes>
-        <Route
-          path="/"
-          element={
-            currentGoal?.status === "in_progress" ? (
-              <Navigate to="/timer" replace />
-            ) : (
-              <Navigate to="/sign-in" replace />
-            )
-          }
-        />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-in" element={<SignIn />} />
 
@@ -165,12 +155,18 @@ function AppContent() {
         <Route
           path="/goal-success"
           element={
-            currentGoal?.status === "success" ? (
-              <PrivateRoute>
-                <GoalSuccess />
-              </PrivateRoute>
+            <PrivateRoute>
+              <GoalSuccess />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            currentGoal?.status === "in_progress" ? (
+              <Navigate to="/timer" replace />
             ) : (
-              <Navigate to="/" replace />
+              <Navigate to="/sign-in" replace />
             )
           }
         />

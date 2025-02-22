@@ -1,7 +1,17 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
+import { useAuth } from "../contexts/AuthContext";
+import { Goal } from "../App";
 
 interface LocationState {
   goal: string;
@@ -10,17 +20,69 @@ interface LocationState {
 }
 
 export default function GoalSuccess() {
+  console.log("GoalSuccess");
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const location = useLocation();
-  const goalData = location.state as LocationState;
-  console.log("goalData:", goalData)
+  const [goalData, setGoalData] = useState<LocationState | null>(
+    location.state
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [amount, setAmount] = useState("");
 
+  useEffect(() => {
+    const fetchGoalData = async () => {
+      console.log("fetchGoalData");
+      if (!goalData) {
+        // if it is then get the goal data from the database
+        // using currentUser.uid in useAuth
+        try {
+          setLoading(true);
+          const goalsRef = collection(db, "goals");
+          const goalsQuery = query(
+            goalsRef,
+            where("userId", "==", currentUser?.uid),
+            where("status", "in", [
+              "pending",
+              "in_progress",
+              "donating",
+              "success",
+            ])
+          );
+
+          const querySnapshot = await getDocs(goalsQuery);
+          const fetchedGoals = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Goal[];
+
+          const currGoalData = {
+            goal: fetchedGoals[0].goal,
+            amount: fetchedGoals[0].amount,
+            goalId: fetchedGoals[0].id,
+          };
+
+          setGoalData(currGoalData);
+          console.log("goalData", goalData);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching goals:", error);
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchGoalData();
+  }, []);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!goalData) {
+      return setError("Goal data not found");
+    }
 
     if (!amount) {
       return setError("Please enter the reimbursement amount");
@@ -94,7 +156,7 @@ export default function GoalSuccess() {
             <h2 className="text-lg font-semibold text-white mb-1">
               Goal Achieved
             </h2>
-            <p className="text-sm text-gray-400">{goalData.goal}</p>
+            <p className="text-sm text-gray-400">{goalData?.goal}</p>
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white mb-1">
@@ -128,7 +190,7 @@ export default function GoalSuccess() {
                 onChange={(e) => setAmount(e.target.value)}
               />
             </div>
-            {error && <p className="mt-2 text-sm text-black">{error}</p>}
+            {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
           </div>
 
           <button

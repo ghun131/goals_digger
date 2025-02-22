@@ -21,11 +21,23 @@ function App() {
           <Routes>
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/goals" element={<GoalSetting />} />
-            <Route path="/deposit" element={<DepositBet />} />
+            <Route path="/goals" element={
+              <ProtectedRoute>
+                <GoalSetting />
+              </ProtectedRoute>
+            } />
+            <Route path="/deposit" element={
+              <ProtectedRoute>
+                <DepositBet />
+              </ProtectedRoute>
+            } />
             <Route 
               path="/waiting-confirmation" 
-              element={<WaitingConfirmation />} 
+              element={
+                <ProtectedRoute>
+                  <WaitingConfirmation />
+                </ProtectedRoute>
+              } 
             />
             
             {/* Protected Routes - Only accessible if goal status is "in_progress" */}
@@ -50,7 +62,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/goal-success" element={
-              <ProtectedRoute requireStatus="in_progress">
+              <ProtectedRoute requireStatus="success">
                 <GoalSuccess />
               </ProtectedRoute>
             } />

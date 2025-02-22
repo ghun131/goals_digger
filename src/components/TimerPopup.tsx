@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import RefreshIcon from "../assets/icons/RefreshIcon";
 
@@ -33,6 +33,7 @@ export default function TimerPopup() {
     minutes: 0,
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     const fetchGoalDetails = async () => {
@@ -86,20 +87,37 @@ export default function TimerPopup() {
 
       return () => clearInterval(timer);
     }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goalDetails]);
 
   const handleGoalAchieved = () => {
     setShowConfirmation(true);
   };
 
-  const handleConfirmAchievement = () => {
-    navigate("/goal-success", {
-      state: {
-        goal: goalDetails?.goal,
-        amount: goalDetails?.amount,
-        goalId: goalDetails?.goalId,
-      },
-    });
+  const handleConfirmAchievement = async () => {
+    try {
+      setIsConfirming(true);
+      
+      // Update goal status to success
+      await updateDoc(doc(db, "goals", goalDetails!.goalId), {
+        status: "success",
+        updatedAt: new Date().getTime(),
+      });
+
+      // Navigate to success page
+      navigate("/goal-success", {
+        state: {
+          goal: goalDetails?.goal,
+          amount: goalDetails?.amount,
+          goalId: goalDetails?.goalId,
+        },
+      });
+    } catch (err) {
+      console.error("Error updating goal status:", err);
+      setError("Failed to update goal status");
+      setIsConfirming(false);
+    }
   };
 
   const handleGiveUp = () => {
@@ -201,13 +219,22 @@ export default function TimerPopup() {
               <div className="flex gap-3">
                 <button
                   onClick={handleConfirmAchievement}
-                  className="bg-green-500 hover:bg-green-600 text-white flex-1 py-2 px-4 rounded-lg font-medium transition-colors"
+                  disabled={isConfirming}
+                  className="bg-green-500 hover:bg-green-600 text-white flex-1 py-2 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
                 >
-                  Yes, I have
+                  {isConfirming ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Confirming...
+                    </>
+                  ) : (
+                    "Yes, I have"
+                  )}
                 </button>
                 <button
                   onClick={() => setShowConfirmation(false)}
-                  className="bg-zinc-800 hover:bg-zinc-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                  disabled={isConfirming}
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white py-2 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Not yet
                 </button>

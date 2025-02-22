@@ -4,6 +4,20 @@ import { useAuth } from "../contexts/AuthContext";
 import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../config/firebase";
 
+interface Goal {
+  id: string;
+  goal: string;
+  deadline: string;
+  time: string;
+  epochTimestamp: number;
+  userId: string;
+  amount: number;
+  transactionId: string;
+  updatedAt: number;
+  status: string;
+  createdAt: number;
+}
+
 export default function GoalSetting() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -16,7 +30,7 @@ export default function GoalSetting() {
   });
 
   useEffect(() => {
-    const checkExistingGoal = async () => {
+    const checkExistingGoals = async () => {
       try {
         if (!currentUser?.uid) return;
 
@@ -25,29 +39,61 @@ export default function GoalSetting() {
         const q = query(
           goalsRef,
           where("userId", "==", currentUser.uid),
-          where("status", "==", "pending")
+          where("status", "in", ["pending", "in_progress", "success"])
         );
 
         const querySnapshot = await getDocs(q);
 
-        // If user has an active goal, redirect to timer
         if (!querySnapshot.empty) {
-          const goalDoc = querySnapshot.docs[0];
-          const goalData = goalDoc.data();
+          const goals = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Goal[];
 
-          navigate("/waiting-confirmation", {
-            state: {
-              goal: goalData.goal,
-              deadline: goalData.deadline,
-              time: goalData.time,
-              epochTimestamp: goalData.epochTimestamp,
-              goalId: goalDoc.id,
-              amount: goalData.amount,
-              transactionId: goalData.transactionId,
-            },
-            replace: true,
-          });
-          return;
+          for (const goal of goals) {
+            switch (goal.status) {
+              case "pending":
+                navigate("/waiting-confirmation", {
+                  state: {
+                    goal: goal.goal,
+                    deadline: goal.deadline,
+                    time: goal.time,
+                    epochTimestamp: goal.epochTimestamp,
+                    goalId: goal.id,
+                    amount: goal.amount,
+                    transactionId: goal.transactionId,
+                  },
+                  replace: true,
+                });
+                break;
+
+              case "in_progress":
+                navigate("/timer", {
+                  state: {
+                    goal: goal.goal,
+                    deadline: goal.deadline,
+                    time: goal.time,
+                    epochTimestamp: goal.epochTimestamp,
+                    goalId: goal.id,
+                    amount: goal.amount,
+                    transactionId: goal.transactionId,
+                  },
+                  replace: true,
+                });
+                break;
+
+              case "success":
+                navigate("/goal-success", {
+                  state: {
+                    goal: goal.goal,
+                    amount: goal.amount,
+                    goalId: goal.id,
+                  },
+                  replace: true,
+                });
+                break;
+            }
+          }
         }
 
         setLoading(false);
@@ -58,7 +104,7 @@ export default function GoalSetting() {
       }
     };
 
-    checkExistingGoal();
+    checkExistingGoals();
   }, [currentUser, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {

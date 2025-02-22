@@ -1,42 +1,41 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
 
-// Mock goal data (same as LoseOptions)
-const mockGoal = {
-  goal: "Learn to play guitar in 3 months",
-  deadline: "2024-06-15",
-  time: "18:00",
-  epochTimestamp: 1718467200000,
-  amount: "500000"
-};
+interface GoalLocationState {
+  goal: string;
+  amount: number;
+  goalId: string;
+  epochTimestamp: number;
+}
 
 const CHARITIES = [
   {
-    id: 'qtnvc',
-    name: 'Quỹ trò nghèo vùng cao',
-    description: 'Supporting education for children in highland areas',
+    id: "qtnvc",
+    name: "Quỹ trò nghèo vùng cao",
+    description: "Supporting education for children in highland areas",
   },
   {
-    id: 'nhandao',
-    name: 'Cổng nhân đạo quốc gia 1400',
-    description: 'National humanitarian gateway for various causes',
+    id: "nhandao",
+    name: "Cổng nhân đạo quốc gia 1400",
+    description: "National humanitarian gateway for various causes",
   },
   {
-    id: 'langtresos',
-    name: 'Làng trẻ SOS',
-    description: 'Providing homes and care for orphaned children',
+    id: "langtresos",
+    name: "Làng trẻ SOS",
+    description: "Providing homes and care for orphaned children",
   },
 ];
 
 export default function CharitySelection() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const goalData = location.state as GoalLocationState;
 
   const handleSelect = (charityId: string) => {
-    navigate('/donation-confirmation', { 
-      state: { 
+    navigate("/donation-confirmation", {
+      state: {
         charityId,
-        amount: mockGoal.amount,
-        goal: mockGoal.goal
-      } 
+        amount: goalData.amount,
+      },
     });
   };
 
@@ -50,14 +49,6 @@ export default function CharitySelection() {
           Choose where you'd like to make your impact
         </p>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-white mb-2">Your Goal</h2>
-          <p className="text-gray-400">{mockGoal.goal}</p>
-          <p className="text-sm text-gray-500 mt-1">
-            Due by: {new Date(mockGoal.epochTimestamp).toLocaleString()}
-          </p>
-        </div>
-
         <div className="space-y-4">
           {CHARITIES.map((charity) => (
             <div
@@ -68,15 +59,16 @@ export default function CharitySelection() {
               <h3 className="text-lg font-semibold text-white mb-1">
                 {charity.name}
               </h3>
-              <p className="text-sm text-gray-400">
-                {charity.description}
-              </p>
+              <p className="text-sm text-gray-400">{charity.description}</p>
             </div>
           ))}
         </div>
 
         <p className="text-sm text-gray-500 mt-6 text-center">
-          Donation amount: {mockGoal.amount} VND
+          Donation amount:{" "}
+          <span className="text-white font-bold">
+            {goalData.amount.toLocaleString()} VND
+          </span>
         </p>
       </div>
     </div>

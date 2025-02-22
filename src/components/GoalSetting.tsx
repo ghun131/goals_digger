@@ -121,7 +121,8 @@ export default function GoalSetting() {
       //   for goal status:
       // pending mean created
       // in_progress mean deposited
-      // success mean achieved goal but not reclaim
+      // success mean achieved goal but not reclaimed
+      // donating mean donated to charity
       // failed mean not achieved
       // completed mean achieved goal and reclaim money
       // Create goal document

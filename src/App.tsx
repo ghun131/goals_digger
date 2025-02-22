@@ -1,22 +1,21 @@
 import {
+  Navigate,
+  Route,
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate,
 } from "react-router-dom";
-import SignUp from "./components/SignUp";
-import SignIn from "./components/SignIn";
-import GoalSetting from "./components/GoalSetting";
-import DepositBet from "./components/DepositBet";
-import LoseOptions from "./components/LoseOptions";
-import CharitySelection from "./components/CharitySelection";
-import TimerPopup from "./components/TimerPopup";
-import DeveloperDonation from "./components/DeveloperDonation";
-import GoalSuccess from "./components/GoalSuccess";
 import "./App.css";
-import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import CharitySelection from "./components/CharitySelection";
+import DepositBet from "./components/DepositBet";
+import DeveloperDonation from "./components/DeveloperDonation";
+import GoalSetting from "./components/GoalSetting";
+import GoalSuccess from "./components/GoalSuccess";
+import LoseOptions from "./components/LoseOptions";
+import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
+import TimerPopup from "./components/TimerPopup";
 import WaitingConfirmation from "./components/WaitingConfirmation";
+import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
   return (
@@ -26,71 +25,18 @@ function App() {
           <Routes>
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/sign-in" element={<SignIn />} />
-            <Route
-              path="/goals"
-              element={
-                <ProtectedRoute>
-                  <GoalSetting />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/deposit"
-              element={
-                <ProtectedRoute>
-                  <DepositBet />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/goals" element={<GoalSetting />} />
+            <Route path="/deposit" element={<DepositBet />} />
             <Route
               path="/waiting-confirmation"
-              element={
-                <ProtectedRoute>
-                  <WaitingConfirmation />
-                </ProtectedRoute>
-              }
+              element={<WaitingConfirmation />}
             />
 
-            <Route
-              path="/timer"
-              element={
-                <ProtectedRoute requireStatuses={["in_progress"]}>
-                  <TimerPopup />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/lose-options"
-              element={
-                <ProtectedRoute requireStatuses={["in_progress"]}>
-                  <LoseOptions />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/charity-selection"
-              element={
-                <ProtectedRoute>
-                  <CharitySelection />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/developer-donation"
-              element={
-                <ProtectedRoute requireStatuses={["in_progress"]}>
-                  <DeveloperDonation />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/goal-success"
-              element={
-                <ProtectedRoute requireStatuses={["success"]}>
-                  <GoalSuccess />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/timer" element={<TimerPopup />} />
+            <Route path="/lose-options" element={<LoseOptions />} />
+            <Route path="/charity-selection" element={<CharitySelection />} />
+            <Route path="/developer-donation" element={<DeveloperDonation />} />
+            <Route path="/goal-success" element={<GoalSuccess />} />
 
             <Route path="/" element={<Navigate to="/sign-in" replace />} />
           </Routes>

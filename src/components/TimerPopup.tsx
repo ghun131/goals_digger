@@ -24,7 +24,6 @@ export default function TimerPopup() {
     hours: 0,
     minutes: 0,
   });
-  const [isOpen, setIsOpen] = useState(true);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const calculateTimeLeft = () => {
@@ -55,52 +54,44 @@ export default function TimerPopup() {
   };
 
   const handleConfirmAchievement = () => {
-    navigate('/goal-success', {
+    navigate("/goal-success", {
       state: {
         goal: mockGoal.goal,
-        amount: mockGoal.amount
-      }
+        amount: mockGoal.amount,
+      },
     });
   };
 
   const handleGiveUp = () => {
-    navigate('/lose-options', {
+    navigate("/lose-options", {
       state: {
         goal: mockGoal.goal,
-        amount: mockGoal.amount
-      }
+        amount: mockGoal.amount,
+      },
     });
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-zinc-900 rounded-3xl p-6 sm:p-8 max-w-[440px] w-full relative">
-        <button
-          onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
-        >
-          ✕
-        </button>
-
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center justify-between gap-2 mb-6">
           <h2 className="text-2xl font-bold text-white">Time Remaining</h2>
-          <button
-            onClick={calculateTimeLeft}
-            title="Refresh timer"
-          >
-            <RefreshIcon />
-          </button>
+          <div>
+            <button
+              onClick={calculateTimeLeft}
+              className="!p-0 !mx-1"
+              title="Refresh timer"
+            >
+              <RefreshIcon />
+            </button>
+          </div>
         </div>
 
         <p className="text-gray-400 mb-6">{mockGoal.goal}</p>
 
         <div className="grid grid-cols-3 gap-2 mb-6">
           <div className="text-center p-3 bg-zinc-800 rounded-lg">
-            <div className="text-2xl font-bold text-white">
-              {timeLeft.days}
-            </div>
+            <div className="text-2xl font-bold text-white">{timeLeft.days}</div>
             <div className="text-sm text-gray-400">Days</div>
           </div>
           <div className="text-center p-3 bg-zinc-800 rounded-lg">
@@ -143,7 +134,7 @@ export default function TimerPopup() {
                 Confirm Achievement
               </h3>
               <p className="text-gray-400 mb-6">
-                Being honest with yourself is the first step to personal growth. 
+                Being honest with yourself is the first step to personal growth.
                 Have you truly achieved your goal?
               </p>
               <div className="flex gap-3">

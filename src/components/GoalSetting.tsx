@@ -1,13 +1,13 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../config/firebase";
 
 export default function GoalSetting() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     goal: "",
@@ -15,9 +15,55 @@ export default function GoalSetting() {
     time: "18:00", // Default time
   });
 
+  useEffect(() => {
+    const checkExistingGoal = async () => {
+      try {
+        if (!currentUser?.uid) return;
+
+        // Query goals collection for active goals
+        const goalsRef = collection(db, "goals");
+        const q = query(
+          goalsRef,
+          where("userId", "==", currentUser.uid),
+          where("status", "==", "pending")
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        // If user has an active goal, redirect to timer
+        if (!querySnapshot.empty) {
+          const goalDoc = querySnapshot.docs[0];
+          const goalData = goalDoc.data();
+
+          navigate("/waiting-confirmation", {
+            state: {
+              goal: goalData.goal,
+              deadline: goalData.deadline,
+              time: goalData.time,
+              epochTimestamp: goalData.epochTimestamp,
+              goalId: goalDoc.id,
+              amount: goalData.amount,
+              transactionId: goalData.transactionId,
+            },
+            replace: true,
+          });
+          return;
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to check existing goals");
+        setLoading(false);
+      }
+    };
+
+    checkExistingGoal();
+  }, [currentUser, navigate]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setError("");
       setLoading(true);
@@ -26,6 +72,12 @@ export default function GoalSetting() {
       const dateTime = new Date(`${formData.deadline}T${formData.time}`);
       const epochTimestamp = dateTime.getTime();
 
+      //   for goal status:
+      // pending mean created
+      // in_progress mean deposited
+      // success mean achieved goal but not reclaim
+      // failed mean not achieved
+      // completed mean achieved goal and reclaim money
       // Create goal document
       const goalData = {
         goal: formData.goal,
@@ -33,6 +85,10 @@ export default function GoalSetting() {
         time: formData.time,
         epochTimestamp,
         userId: currentUser?.uid,
+        amount: 0,
+        transactionId: null,
+        updatedAt: new Date().getTime(),
+        status: "pending",
         createdAt: new Date().getTime(),
       };
 
@@ -46,10 +102,9 @@ export default function GoalSetting() {
           deadline: formData.deadline,
           time: formData.time,
           epochTimestamp,
-          goalId: docRef.id
-        }
+          goalId: docRef.id,
+        },
       });
-
     } catch (err) {
       console.error(err);
       setError("Failed to create goal");
@@ -57,6 +112,14 @@ export default function GoalSetting() {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center bg-black">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex items-center justify-center bg-black p-4">
@@ -106,7 +169,7 @@ export default function GoalSetting() {
               id="deadline"
               type="date"
               required
-              min={new Date().toISOString().split('T')[0]}
+              min={new Date().toISOString().split("T")[0]}
               className="w-full px-4 py-3 bg-black rounded-lg border border-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={formData.deadline}
               onChange={(e) =>
@@ -145,4 +208,4 @@ export default function GoalSetting() {
       </div>
     </div>
   );
-} 
+}

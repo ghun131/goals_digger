@@ -1,5 +1,7 @@
 import { FormEvent, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 import bankQR from "../assets/host_bank_qr.jpeg";
 
 interface LocationState {
@@ -7,24 +9,57 @@ interface LocationState {
   deadline: string;
   time: string;
   epochTimestamp: number;
+  goalId: string;
 }
 
 export default function DepositBet() {
+  const navigate = useNavigate();
   const location = useLocation();
   const goalData = location.state as LocationState;
   const [isExpanded, setIsExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     amount: "",
     transactionId: "",
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("Bet submitted:", {
-      ...formData,
-      goalData,
-    });
+
+    if (!formData.amount || Number(formData.amount) < 10000) {
+      setError("Please enter a valid amount (minimum 10,000 VND)");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      // Update goal document with deposit amount
+      const goalRef = doc(db, "goals", goalData.goalId);
+      await updateDoc(goalRef, {
+        amount: Number(formData.amount),
+        transactionId: formData.transactionId || null,
+        updatedAt: new Date().getTime(),
+      });
+
+      // Navigate to waiting confirmation page
+      navigate("/waiting-confirmation", {
+        state: {
+          ...goalData,
+          amount: Number(formData.amount),
+          transactionId: formData.transactionId
+        },
+        replace: true
+      });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to process deposit");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const deadlineDate = new Date(goalData?.epochTimestamp).toLocaleString();
@@ -38,6 +73,12 @@ export default function DepositBet() {
         <p className="text-base sm:text-lg text-gray-400 mb-8">
           Make a deposit to commit to your goal
         </p>
+
+        {error && (
+          <div className="bg-red-500 bg-opacity-10 text-red-500 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-white mb-2">Your Goal</h2>
@@ -108,7 +149,7 @@ export default function DepositBet() {
               id="transactionId"
               type="text"
               className="w-full px-4 py-3 bg-black rounded-lg border border-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter transaction reference"
+              placeholder="Transaction reference (Transfer message, etc.)"
               value={formData.transactionId}
               onChange={(e) =>
                 setFormData({ ...formData, transactionId: e.target.value })
@@ -118,9 +159,10 @@ export default function DepositBet() {
 
           <button
             type="submit"
-            className="bg-white w-full mt-6 py-3 px-4 rounded-lg font-medium transition-colors hover:bg-gray-100"
+            disabled={loading}
+            className="bg-white w-full mt-6 py-3 px-4 rounded-lg font-medium transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Confirm Deposit
+            {loading ? "Processing..." : "Confirm Deposit"}
           </button>
         </form>
       </div>

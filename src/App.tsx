@@ -11,6 +11,7 @@ import GoalSuccess from "./components/GoalSuccess";
 import "./App.css";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import WaitingConfirmation from "./components/WaitingConfirmation";
 
 function App() {
   return (
@@ -20,40 +21,36 @@ function App() {
           <Routes>
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/goals" element={<GoalSetting />} />
+            <Route path="/deposit" element={<DepositBet />} />
+            <Route 
+              path="/waiting-confirmation" 
+              element={<WaitingConfirmation />} 
+            />
             
-            {/* Protected Routes */}
-            <Route path="/goals" element={
-              <ProtectedRoute>
-                <GoalSetting />
-              </ProtectedRoute>
-            } />
-            <Route path="/deposit" element={
-              <ProtectedRoute>
-                <DepositBet />
-              </ProtectedRoute>
-            } />
+            {/* Protected Routes - Only accessible if goal status is "in_progress" */}
             <Route path="/timer" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStatus="in_progress">
                 <TimerPopup />
               </ProtectedRoute>
             } />
             <Route path="/lose-options" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStatus="in_progress">
                 <LoseOptions />
               </ProtectedRoute>
             } />
             <Route path="/charity-selection" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStatus="in_progress">
                 <CharitySelection />
               </ProtectedRoute>
             } />
             <Route path="/developer-donation" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStatus="in_progress">
                 <DeveloperDonation />
               </ProtectedRoute>
             } />
             <Route path="/goal-success" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStatus="in_progress">
                 <GoalSuccess />
               </ProtectedRoute>
             } />

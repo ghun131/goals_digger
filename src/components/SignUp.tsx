@@ -70,6 +70,7 @@ export default function SignUp() {
 
       // Save user data to Firestore
       await setDoc(doc(db, "users", userId), {
+        userId,
         email: formData.email,
         bankName: formData.bankName,
         bankingNumber: formData.bankingNumber,

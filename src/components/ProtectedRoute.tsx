@@ -1,19 +1,52 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requireStatus?: string;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, requireStatus }: ProtectedRouteProps) {
   const { currentUser, loading } = useAuth();
+  const location = useLocation();
+  const [goalStatus, setGoalStatus] = useState<string | null>(null);
+  const [checkingStatus, setCheckingStatus] = useState(true);
 
-  if (loading) {
-    return <div>Loading...</div>; // You can create a proper loading component
+  useEffect(() => {
+    const checkGoalStatus = async () => {
+      if (!location.state?.goalId) {
+        setCheckingStatus(false);
+        return;
+      }
+
+      try {
+        const goalDoc = await getDoc(doc(db, "goals", location.state.goalId));
+        if (goalDoc.exists()) {
+          setGoalStatus(goalDoc.data().status);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setCheckingStatus(false);
+      }
+    };
+
+    checkGoalStatus();
+  }, [location.state?.goalId]);
+
+  if (loading || checkingStatus) {
+    return <div>Loading...</div>;
   }
 
   if (!currentUser) {
     return <Navigate to="/sign-in" />;
+  }
+
+  if (requireStatus && goalStatus !== requireStatus) {
+    return <Navigate to="/goals" />;
   }
 
   return <>{children}</>;

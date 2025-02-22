@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 import RefreshIcon from "../assets/icons/RefreshIcon";
 
-// Mock goal data
-const mockGoal = {
-  goal: "Learn to play guitar in 3 months",
-  deadline: "2024-06-15",
-  time: "18:00",
-  epochTimestamp: 1740198120000,
-  amount: "500000",
-};
+interface LocationState {
+  goal: string;
+  deadline: string;
+  time: string;
+  epochTimestamp: number;
+  goalId: string;
+  amount: number;
+  transactionId: string;
+}
 
 interface TimeLeft {
   days: number;
@@ -19,6 +22,11 @@ interface TimeLeft {
 
 export default function TimerPopup() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const goalData = location.state as LocationState;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [goalDetails, setGoalDetails] = useState<LocationState | null>(null);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: 0,
     hours: 0,
@@ -26,8 +34,37 @@ export default function TimerPopup() {
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  useEffect(() => {
+    const fetchGoalDetails = async () => {
+      try {
+        const goalDoc = await getDoc(doc(db, "goals", goalData.goalId));
+        if (goalDoc.exists()) {
+          const data = goalDoc.data();
+          setGoalDetails({
+            goal: data.goal,
+            deadline: data.deadline,
+            time: data.time,
+            epochTimestamp: data.epochTimestamp,
+            goalId: goalData.goalId,
+            amount: data.amount,
+            transactionId: data.transactionId,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching goal:", err);
+        setError("Failed to load goal details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGoalDetails();
+  }, [goalData.goalId]);
+
   const calculateTimeLeft = () => {
-    const difference = mockGoal.epochTimestamp - new Date().getTime();
+    if (!goalDetails) return;
+
+    const difference = goalDetails.epochTimestamp - new Date().getTime();
 
     if (difference > 0) {
       setTimeLeft({
@@ -42,12 +79,14 @@ export default function TimerPopup() {
   };
 
   useEffect(() => {
-    // Calculate immediately and then update every minute
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 60000);
+    if (goalDetails) {
+      // Calculate immediately and then update every minute
+      calculateTimeLeft();
+      const timer = setInterval(calculateTimeLeft, 60000);
 
-    return () => clearInterval(timer);
-  }, [navigate]);
+      return () => clearInterval(timer);
+    }
+  }, [goalDetails]);
 
   const handleGoalAchieved = () => {
     setShowConfirmation(true);
@@ -56,8 +95,9 @@ export default function TimerPopup() {
   const handleConfirmAchievement = () => {
     navigate("/goal-success", {
       state: {
-        goal: mockGoal.goal,
-        amount: mockGoal.amount,
+        goal: goalDetails?.goal,
+        amount: goalDetails?.amount,
+        goalId: goalDetails?.goalId,
       },
     });
   };
@@ -65,11 +105,36 @@ export default function TimerPopup() {
   const handleGiveUp = () => {
     navigate("/lose-options", {
       state: {
-        goal: mockGoal.goal,
-        amount: mockGoal.amount,
+        goal: goalDetails?.goal,
+        amount: goalDetails?.amount,
+        goalId: goalDetails?.goalId,
       },
     });
   };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
+
+  if (!goalDetails) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="text-white">No goal found</div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -87,7 +152,7 @@ export default function TimerPopup() {
           </div>
         </div>
 
-        <p className="text-gray-400 mb-6">{mockGoal.goal}</p>
+        <p className="text-gray-400 mb-6">{goalDetails.goal}</p>
 
         <div className="grid grid-cols-3 gap-2 mb-6">
           <div className="text-center p-3 bg-zinc-800 rounded-lg">
@@ -95,21 +160,17 @@ export default function TimerPopup() {
             <div className="text-sm text-gray-400">Days</div>
           </div>
           <div className="text-center p-3 bg-zinc-800 rounded-lg">
-            <div className="text-2xl font-bold text-white">
-              {timeLeft.hours}
-            </div>
+            <div className="text-2xl font-bold text-white">{timeLeft.hours}</div>
             <div className="text-sm text-gray-400">Hours</div>
           </div>
           <div className="text-center p-3 bg-zinc-800 rounded-lg">
-            <div className="text-2xl font-bold text-white">
-              {timeLeft.minutes}
-            </div>
+            <div className="text-2xl font-bold text-white">{timeLeft.minutes}</div>
             <div className="text-sm text-gray-400">Minutes</div>
           </div>
         </div>
 
         <div className="text-center text-sm text-gray-400">
-          Due by: {new Date(mockGoal.epochTimestamp).toLocaleString()}
+          Due by: {new Date(goalDetails.epochTimestamp).toLocaleString()}
         </div>
 
         <div className="flex gap-3 mt-8">

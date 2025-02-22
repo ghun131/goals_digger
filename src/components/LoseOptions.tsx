@@ -1,4 +1,7 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { doc } from 'firebase/firestore';
+import { updateDoc } from "firebase/firestore";
+import { useLocation, useNavigate } from "react-router-dom";
+import { db } from '../config/firebase';
 
 interface GoalLocationState {
   goal: string;
@@ -12,11 +15,16 @@ export default function LoseOptions() {
   const location = useLocation();
   const goalData = location.state as GoalLocationState;
 
-  const handleOptionSelect = (option: 'developers' | 'charity') => {
-    if (option === 'charity') {
-      navigate('/charity-selection', { state: goalData });
+  const handleOptionSelect = async (option: "developers" | "charity") => {
+    if (option === "charity") {
+      navigate("/charity-selection", { state: goalData });
     } else {
-      navigate('/developer-donation', { state: goalData });
+      await updateDoc(doc(db, "goals", goalData.goalId), {
+        status: "failed",
+        updatedAt: new Date().getTime(),
+      });
+
+      navigate("/developer-donation", { state: goalData });
     }
   };
 
@@ -39,16 +47,16 @@ export default function LoseOptions() {
         </div>
 
         <div className="space-y-6">
-          <div 
-            onClick={() => handleOptionSelect('developers')}
+          <div
+            onClick={() => handleOptionSelect("developers")}
             className="p-6 rounded-xl bg-zinc-800 hover:bg-zinc-700 cursor-pointer transition-colors text-left"
           >
             <h3 className="text-xl font-semibold text-white mb-2">
               Donate to Developers
             </h3>
             <p className="text-gray-400">
-              Support the developers who built this platform to help people achieve their goals. 
-              Your contribution helps us:
+              Support the developers who built this platform to help people
+              achieve their goals. Your contribution helps us:
             </p>
             <ul className="mt-3 space-y-2 text-gray-400">
               <li className="flex items-start">
@@ -66,15 +74,16 @@ export default function LoseOptions() {
             </ul>
           </div>
 
-          <div 
-            onClick={() => handleOptionSelect('charity')}
+          <div
+            onClick={() => handleOptionSelect("charity")}
             className="p-6 rounded-xl bg-zinc-800 hover:bg-zinc-700 cursor-pointer transition-colors text-left"
           >
             <h3 className="text-xl font-semibold text-white mb-2">
               Donate to Charity
             </h3>
             <p className="text-gray-400">
-              Make a meaningful impact by supporting one of our trusted charity partners:
+              Make a meaningful impact by supporting one of our trusted charity
+              partners:
             </p>
             <ul className="mt-3 space-y-2 text-gray-400">
               <li className="flex items-start">
@@ -98,7 +107,8 @@ export default function LoseOptions() {
         </div>
 
         <p className="text-sm text-gray-500 mt-6 text-center">
-          Select an option to proceed with your donation of {goalData.amount} VND
+          Select an option to proceed with your donation of {goalData.amount}{" "}
+          VND
         </p>
       </div>
     </div>

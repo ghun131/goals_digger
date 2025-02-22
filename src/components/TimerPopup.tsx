@@ -80,6 +80,14 @@ export default function TimerPopup() {
   };
 
   useEffect(() => {
+    if (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0) {
+      handleGiveUp();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft.days, timeLeft.hours, timeLeft.minutes]);
+
+  useEffect(() => {
     if (goalDetails) {
       // Calculate immediately and then update every minute
       calculateTimeLeft();
@@ -88,7 +96,7 @@ export default function TimerPopup() {
       return () => clearInterval(timer);
     }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goalDetails]);
 
   const handleGoalAchieved = () => {
@@ -98,7 +106,7 @@ export default function TimerPopup() {
   const handleConfirmAchievement = async () => {
     try {
       setIsConfirming(true);
-      
+
       // Update goal status to success
       await updateDoc(doc(db, "goals", goalDetails!.goalId), {
         status: "success",
@@ -178,11 +186,15 @@ export default function TimerPopup() {
             <div className="text-sm text-gray-400">Days</div>
           </div>
           <div className="text-center p-3 bg-zinc-800 rounded-lg">
-            <div className="text-2xl font-bold text-white">{timeLeft.hours}</div>
+            <div className="text-2xl font-bold text-white">
+              {timeLeft.hours}
+            </div>
             <div className="text-sm text-gray-400">Hours</div>
           </div>
           <div className="text-center p-3 bg-zinc-800 rounded-lg">
-            <div className="text-2xl font-bold text-white">{timeLeft.minutes}</div>
+            <div className="text-2xl font-bold text-white">
+              {timeLeft.minutes}
+            </div>
             <div className="text-sm text-gray-400">Minutes</div>
           </div>
         </div>

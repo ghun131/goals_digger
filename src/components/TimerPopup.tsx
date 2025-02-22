@@ -25,6 +25,7 @@ export default function TimerPopup() {
     minutes: 0,
   });
   const [isOpen, setIsOpen] = useState(true);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const calculateTimeLeft = () => {
     const difference = mockGoal.epochTimestamp - new Date().getTime();
@@ -50,6 +51,10 @@ export default function TimerPopup() {
   }, [navigate]);
 
   const handleGoalAchieved = () => {
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmAchievement = () => {
     navigate('/goal-success', {
       state: {
         goal: mockGoal.goal,
@@ -130,6 +135,34 @@ export default function TimerPopup() {
             I give up
           </button>
         </div>
+
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-zinc-900 rounded-xl p-6 max-w-sm w-full">
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Confirm Achievement
+              </h3>
+              <p className="text-gray-400 mb-6">
+                Being honest with yourself is the first step to personal growth. 
+                Have you truly achieved your goal?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleConfirmAchievement}
+                  className="bg-green-500 hover:bg-green-600 text-white flex-1 py-2 px-4 rounded-lg font-medium transition-colors"
+                >
+                  Yes, I have
+                </button>
+                <button
+                  onClick={() => setShowConfirmation(false)}
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                >
+                  Not yet
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

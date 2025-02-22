@@ -39,7 +39,7 @@ export default function GoalSetting() {
         const q = query(
           goalsRef,
           where("userId", "==", currentUser.uid),
-          where("status", "in", ["pending", "in_progress", "success"])
+          where("status", "in", ["pending", "in_progress", "success", "donating"])
         );
 
         const querySnapshot = await getDocs(q);
@@ -49,6 +49,7 @@ export default function GoalSetting() {
             id: doc.id,
             ...doc.data(),
           })) as Goal[];
+          console.log("goals:", goals)
 
           for (const goal of goals) {
             switch (goal.status) {
@@ -92,6 +93,15 @@ export default function GoalSetting() {
                   replace: true,
                 });
                 break;
+
+              case "donating":
+                navigate("/charity-selection", {
+                  state: {
+                    goal: goal.goal,
+                    amount: goal.amount,
+                    goalId: goal.id,
+                  },
+                });
             }
           }
         }

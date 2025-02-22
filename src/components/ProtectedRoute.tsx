@@ -6,10 +6,13 @@ import { db } from "../config/firebase";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireStatus?: string;
+  requireStatuses?: string[];
 }
 
-export default function ProtectedRoute({ children, requireStatus }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  requireStatuses,
+}: ProtectedRouteProps) {
   const { currentUser, loading } = useAuth();
   const location = useLocation();
   const [goalStatus, setGoalStatus] = useState<string | null>(null);
@@ -45,9 +48,9 @@ export default function ProtectedRoute({ children, requireStatus }: ProtectedRou
     return <Navigate to="/sign-in" />;
   }
 
-  if (requireStatus && goalStatus !== requireStatus) {
+  if (requireStatuses?.includes(goalStatus || "")) {
     return <Navigate to="/goals" />;
   }
 
   return <>{children}</>;
-} 
+}

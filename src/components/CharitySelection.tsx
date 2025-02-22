@@ -56,6 +56,7 @@ export default function CharitySelection() {
   const location = useLocation();
   const { currentUser } = useAuth();
   const goalData = location.state as GoalLocationState;
+  console.log("goalData:", goalData)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [existingDonation, setExistingDonation] = useState<Donation | null>(
@@ -95,7 +96,7 @@ export default function CharitySelection() {
     };
 
     checkExistingDonation();
-  }, [currentUser, goalData, navigate]);
+  }, []);
 
   const handleSelect = async (charityId: string) => {
     try {
@@ -130,7 +131,7 @@ export default function CharitySelection() {
       };
 
       await addDoc(collection(db, "donations"), donationData);
-      setExistingDonation(donationData);
+      setExistingDonation(donationData as Donation);
     } catch (err) {
       console.error("Error processing donation:", err);
       setError("Failed to process donation. Please try again.");

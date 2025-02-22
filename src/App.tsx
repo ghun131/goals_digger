@@ -52,7 +52,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/charity-selection" element={
-              <ProtectedRoute requireStatus="in_progress">
+              <ProtectedRoute>
                 <CharitySelection />
               </ProtectedRoute>
             } />

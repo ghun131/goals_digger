@@ -41,7 +41,7 @@ export default function GoalSuccess() {
       if (Number(amount) !== goalAmount) {
         // TODO: Add a popup to contact us using social media
         setError(
-          `If you received less than ${goalAmount.toLocaleString()} VND, find support at https://www.linkedin.com/in/hung-dang-72ba0078`
+          `If you received other than ${goalAmount.toLocaleString()} VND, find support at https://www.linkedin.com/in/hung-dang-72ba0078`
         );
         return;
       }
@@ -98,11 +98,8 @@ export default function GoalSuccess() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white mb-1">
-              Deposit Return
+              Your deposit is returned
             </h2>
-            <p className="text-sm text-gray-400">
-              Amount: {goalData.amount.toLocaleString()} VND
-            </p>
             <p className="text-sm text-gray-400 mt-2">
               Your deposit will be returned to your account within 24 hours
             </p>
@@ -115,7 +112,7 @@ export default function GoalSuccess() {
               htmlFor="amount"
               className="block text-sm font-medium text-white mb-2"
             >
-              Enter Reimbursement Amount (VND)
+              Be sure you received the correct amount by enter the amount below
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">

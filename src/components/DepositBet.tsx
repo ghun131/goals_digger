@@ -9,7 +9,8 @@ interface LocationState {
   goal: string;
   deadline: string;
   time: string;
-  epochTimestamp: number;
+  epochTimestamp: number
+              ;
   goalId: string;
 }
 
@@ -124,7 +125,7 @@ export default function DepositBet() {
     <div className="min-h-screen bg-black py-8 px-4">
       <div className="max-w-[440px] mx-auto p-6 sm:p-8 rounded-3xl bg-zinc-900">
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
-          Back your goal
+          Bet on your goal
         </h1>
         <p className="text-base sm:text-lg text-gray-400 mb-8">
           Make a deposit to commit to your goal

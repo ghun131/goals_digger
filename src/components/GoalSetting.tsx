@@ -174,7 +174,7 @@ export default function GoalSetting() {
           Set your goal
         </h1>
         <p className="text-base sm:text-lg text-gray-400 mb-8">
-          What do you want to achieve?
+          What do you want to achieve or what habit you want to shape?
         </p>
 
         {error && (

@@ -213,7 +213,7 @@ export default function TimerPopup() {
                 Confirm Achievement
               </h3>
               <p className="text-gray-400 mb-6">
-                Being honest with yourself is the first step to personal growth.
+                Being HONEST with yourself is the first step to personal growth.
                 Have you truly achieved your goal?
               </p>
               <div className="flex gap-3">

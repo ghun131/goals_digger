@@ -16,11 +16,6 @@ const CHARITIES = [
     description: 'Supporting education for children in highland areas',
   },
   {
-    id: 'nuoiem',
-    name: 'Nuôi em & Cặp lá yêu thương',
-    description: 'Providing care and support for disadvantaged children',
-  },
-  {
     id: 'nhandao',
     name: 'Cổng nhân đạo quốc gia 1400',
     description: 'National humanitarian gateway for various causes',
